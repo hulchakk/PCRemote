@@ -1,0 +1,19 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='css/media.css') }}">
+
+<div class="remote-wrapper">
+  <div class="controls">
+    <button class="remote-btn" data-key="up">↑</button>
+    <button class="remote-btn" data-key="space">▶</button>
+    <button class="remote-btn small" data-key="fullscreen">⛶</button>
+
+    <button class="remote-btn" data-key="left">←</button>
+    <button class="remote-btn" data-key="down">↓</button>
+    <button class="remote-btn" data-key="right">→</button>
+
+    <button class="remote-btn volume" data-key="vol-up"></button>
+    <button class="remote-btn volume" data-key="mute">🔇</button>
+    <button class="remote-btn volume" data-key="vol-down">−</button>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/media.js') }}"></script>
