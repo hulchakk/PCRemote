@@ -1,6 +1,35 @@
+import os
+import shutil
+import subprocess
+import sys
+
 from pynput.keyboard import Controller as KeyboardController, Key, KeyCode
 
 keyboard_controller = KeyboardController()
+
+
+def system_sleep():
+    if sys.platform.startswith("win"):
+        subprocess.run(
+            ["rundll32.exe", "powrprof.dll,SetSuspendState", "0,1,0"], check=True
+        )
+    elif sys.platform == "darwin":
+        subprocess.run(["pmset", "sleepnow"], check=True)
+    else:
+        if shutil.which("systemctl"):
+            cmd = ["systemctl", "suspend"]
+            if os.name != "nt" and shutil.which("sudo"):
+                cmd = ["sudo"] + cmd
+            subprocess.run(cmd, check=True)
+        elif shutil.which("pm-suspend"):
+            cmd = ["pm-suspend"]
+            if os.name != "nt" and shutil.which("sudo"):
+                cmd = ["sudo"] + cmd
+            subprocess.run(cmd, check=True)
+        else:
+            raise RuntimeError(
+                "No known suspend command found (systemctl or pm-suspend)."
+            )
 
 
 def press_key(key: Key | str):
@@ -19,4 +48,7 @@ BINDS = {
     "space": lambda: press_key(Key.space),
     "esc": lambda: press_key(Key.esc),
     "fullscreen": lambda: press_key("f"),
+    "vol-up": lambda: press_key(Key.media_volume_up),
+    "vol-down": lambda: press_key(Key.media_volume_down),
+    "mute": lambda: press_key(Key.media_volume_mute),
 }
