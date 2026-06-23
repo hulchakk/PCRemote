@@ -50,6 +50,7 @@ def handle_mouse_move(data):
     except Exception as e:
         print(f"Mouse move error: {e}")
 
+
 @socketio.on("mouse_click")
 def handle_mouse_click(data):
     try:

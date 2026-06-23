@@ -54,6 +54,12 @@ def click_mouse(button_type: str):
         mouse_controller.click(Button.right, 1)
 
 
+def type_text(text: str):
+    if not isinstance(text, str):
+        return
+    keyboard_controller.type(text)
+
+
 BINDS = {
     "left": lambda: press_key(Key.left),
     "right": lambda: press_key(Key.right),
@@ -65,4 +71,5 @@ BINDS = {
     "vol-up": lambda: press_key(Key.media_volume_up),
     "vol-down": lambda: press_key(Key.media_volume_down),
     "mute": lambda: press_key(Key.media_volume_mute),
+    "delete": lambda: press_key(Key.backspace),
 }
