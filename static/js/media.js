@@ -1,21 +1,45 @@
-document.addEventListener("click", async (event) => {
+let holdTimeout = null;
+let spamInterval = null;
+
+function sendMediaKey(keyName) {
+    if (window.socket && window.socket.connected) {
+        window.socket.emit("keyboard", { key: keyName });
+    }
+}
+
+function clearTimers() {
+    if (holdTimeout) {
+        clearTimeout(holdTimeout);
+        holdTimeout = null;
+    }
+    if (spamInterval) {
+        clearInterval(spamInterval);
+        spamInterval = null;
+    }
+}
+
+document.addEventListener("pointerdown", (event) => {
     const button = event.target.closest(".media-btn");
     if (!button) return;
 
     const keyName = button.getAttribute("data-key");
     if (!keyName) return;
 
-    const requestData = { key: keyName };
+    clearTimers();
 
-    try {
-        await fetch("/api/keyboard", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(requestData)
-        });
-    } catch (error) {
-        console.error("Media command error:", error);
-    }
+    sendMediaKey(keyName);
+
+    holdTimeout = setTimeout(() => {
+        spamInterval = setInterval(() => {
+            sendMediaKey(keyName);
+        }, 100); 
+    }, 500);
 });
+
+document.addEventListener("pointerup", clearTimers);
+document.addEventListener("pointercancel", clearTimers);
+document.addEventListener("pointerleave", (event) => {
+    if (event.target.closest(".media-btn")) {
+        clearTimers();
+    }
+}, true);

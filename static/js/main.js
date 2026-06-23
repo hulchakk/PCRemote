@@ -1,3 +1,5 @@
+window.socket = io();
+
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("remote-container");
     const tabs = document.querySelectorAll(".tab-btn");
@@ -14,22 +16,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    document.addEventListener("click", async (event) => {
+    document.addEventListener("click", (event) => {
         const button = event.target.closest(".remote-btn");
         if (!button) return;
 
         const keyName = button.getAttribute("data-key");
         if (!keyName) return;
 
-        try {
-            await fetch("/api/keyboard", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ key: keyName })
-            });
-        } catch (error) {
-            console.error("System command error:", error);
-        }
+        window.socket.emit("keyboard", { key: keyName });
     });
 
     tabs.forEach(tab => {
@@ -44,17 +38,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     if (sleepBtn) {
-        sleepBtn.addEventListener("click", async () => {
+        sleepBtn.addEventListener("click", () => {
             if (!confirm("Do you want to sleep?")) return;
-            try {
-                await fetch("/api/system_sleep", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ action: "sleep" })
-                });
-            } catch (error) {
-                console.error("Sleep command error:", error);
-            }
+            window.socket.emit("system_sleep", { action: "sleep" });
         });
     }
 
