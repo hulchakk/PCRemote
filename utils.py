@@ -43,7 +43,8 @@ def press_key(key: Key | str):
 
 
 def move_mouse(dx: int, dy: int):
-    mouse_controller.move(dx, dy)
+    sensativity = 1.5
+    mouse_controller.move(dx * sensativity, dy * sensativity)
 
 
 def click_mouse(button_type: str):

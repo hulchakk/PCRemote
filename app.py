@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
-from utils import BINDS, system_sleep
+from utils import BINDS, system_sleep, click_mouse, move_mouse
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "12345"
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-VALID_REMOTES = ("media",)
+VALID_REMOTES = ("media", "touchpad")
 
 
 @app.route("/partials/<remote_type>")
@@ -39,6 +39,24 @@ def handle_system_sleep(data):
         emit("response", {"status": "ok"})
     except Exception as e:
         emit("response", {"status": "error", "message": str(e)})
+
+
+@socketio.on("mouse_move")
+def handle_mouse_move(data):
+    try:
+        dx = data.get("dx", 0)
+        dy = data.get("dy", 0)
+        move_mouse(dx, dy)
+    except Exception as e:
+        print(f"Mouse move error: {e}")
+
+@socketio.on("mouse_click")
+def handle_mouse_click(data):
+    try:
+        button = data.get("button", "left")
+        click_mouse(button)
+    except Exception as e:
+        print(f"Mouse click error: {e}")
 
 
 if __name__ == "__main__":
