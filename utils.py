@@ -72,4 +72,8 @@ BINDS = {
     "vol-down": lambda: press_key(Key.media_volume_down),
     "mute": lambda: press_key(Key.media_volume_mute),
     "delete": lambda: press_key(Key.backspace),
+    "enter": lambda: press_key(Key.enter),
+    "back": lambda: press_key(Key.left),
+    "forward": lambda: press_key(Key.right),
+    "refresh": lambda: press_key(Key.space),
 }
