@@ -1,12 +1,12 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
-from utils import BINDS, system_sleep, click_mouse, move_mouse
+from utils import BINDS, system_sleep, click_mouse, move_mouse, type_text
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "12345"
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-VALID_REMOTES = ("media", "touchpad")
+VALID_REMOTES = ("media", "touchpad", "text")
 
 
 @app.route("/partials/<remote_type>")
@@ -28,6 +28,15 @@ def handle_keyboard(data):
         if key in BINDS:
             BINDS[key]()
             emit("response", {"status": "ok"})
+    except Exception as e:
+        emit("response", {"status": "error", "message": str(e)})
+
+
+@socketio.on("text")
+def handle_text(data):
+    try:
+        text = data.get("text")
+        type_text(text)
     except Exception as e:
         emit("response", {"status": "error", "message": str(e)})
 
