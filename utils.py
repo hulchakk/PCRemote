@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import sys
 
+from pynput import keyboard
 from pynput.keyboard import Controller as KeyboardController, Key, KeyCode
 from pynput.mouse import Controller as MouseController, Button
 
@@ -42,9 +43,18 @@ def press_key(key: Key | str):
     keyboard_controller.release(key)
 
 
+def press_key_combination(first: Key | str, second: Key | str):
+    if isinstance(first, str):
+        first = KeyCode.from_char(first)
+    if isinstance(second, str):
+        second = KeyCode.from_char(second)
+    with keyboard_controller.pressed(first):
+        keyboard_controller.press(second)
+        keyboard_controller.release(second)
+
+
 def move_mouse(dx: int, dy: int):
-    sensativity = 1.5
-    mouse_controller.move(dx * sensativity, dy * sensativity)
+    mouse_controller.move(dx * SENSATIVITY, dy * SENSATIVITY)
 
 
 def click_mouse(button_type: str):
@@ -60,6 +70,13 @@ def type_text(text: str):
     keyboard_controller.type(text)
 
 
+def clear_text():
+    BINDS["select"]()
+    BINDS["delete"]()
+
+
+SENSATIVITY = 1.8
+
 BINDS = {
     "left": lambda: press_key(Key.left),
     "right": lambda: press_key(Key.right),
@@ -73,7 +90,11 @@ BINDS = {
     "mute": lambda: press_key(Key.media_volume_mute),
     "delete": lambda: press_key(Key.backspace),
     "enter": lambda: press_key(Key.enter),
-    "back": lambda: press_key(Key.left),
-    "forward": lambda: press_key(Key.right),
-    "refresh": lambda: press_key(Key.space),
+    "back": lambda: press_key_combination(Key.cmd, Key.left),
+    "forward": lambda: press_key_combination(Key.cmd, Key.right),
+    "refresh": lambda: press_key_combination(Key.cmd, "r"),
+    "undo": lambda: press_key_combination(Key.cmd, "z"),
+    "redo": lambda: press_key_combination(Key.cmd, "y"),
+    "clear": clear_text,
+    "select": lambda: press_key_combination(Key.cmd, "a"),
 }
