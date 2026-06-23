@@ -1,24 +1,21 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("click", async (event) => {
+    const button = event.target.closest(".media-btn");
+    if (!button) return;
 
-    const buttons = document.querySelectorAll(".remote-btn");
+    const keyName = button.getAttribute("data-key");
+    if (!keyName) return;
 
-    buttons.forEach(button => {
-        button.addEventListener("click", async (event) => {
-            const keyName = event.currentTarget.getAttribute("data-key");
+    const requestData = { key: keyName };
 
-            const requestData = { key: keyName };
-
-            try {
-                const response = await fetch("/api/keyboard", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify(requestData)
-                });
-            } catch (error) {
-                console.error("Error", error);
-            }
+    try {
+        await fetch("/api/keyboard", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestData)
         });
-    });
+    } catch (error) {
+        console.error("Media command error:", error);
+    }
 });

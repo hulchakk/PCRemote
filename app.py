@@ -32,6 +32,7 @@ def keyboard():
 def system():
     try:
         system_sleep()
+        return {"status": "ok"}
 
     except Exception as e:
         return {"status": "error", "message": str(e)}

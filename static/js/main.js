@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 container.innerHTML = await response.text();
             }
         } catch (error) {
-            console.error(error);
+            console.error("Load tab error:", error);
         }
     }
 
@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 body: JSON.stringify({ key: keyName })
             });
         } catch (error) {
-            console.error(error);
+            console.error("System command error:", error);
         }
     });
 
@@ -37,23 +37,26 @@ document.addEventListener("DOMContentLoaded", () => {
             const currentTab = e.currentTarget;
             tabs.forEach(t => t.classList.remove("active"));
             currentTab.classList.add("active");
+
             const targetRemote = currentTab.getAttribute("data-target");
             loadRemote(targetRemote);
         });
     });
 
-    sleepBtn.addEventListener("click", async () => {
-        if (!confirm("Do you want to sleep?")) return;
-        try {
-            await fetch("/api/system_sleep", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "sleep" })
-            });
-        } catch (error) {
-            console.error(error);
-        }
-    });
+    if (sleepBtn) {
+        sleepBtn.addEventListener("click", async () => {
+            if (!confirm("Do you want to sleep?")) return;
+            try {
+                await fetch("/api/system_sleep", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ action: "sleep" })
+                });
+            } catch (error) {
+                console.error("Sleep command error:", error);
+            }
+        });
+    }
 
     loadRemote("media");
 });
