@@ -4,8 +4,10 @@ import subprocess
 import sys
 
 from pynput.keyboard import Controller as KeyboardController, Key, KeyCode
+from pynput.mouse import Controller as MouseController, Button
 
 keyboard_controller = KeyboardController()
+mouse_controller = MouseController()
 
 
 def system_sleep():
@@ -38,6 +40,17 @@ def press_key(key: Key | str):
     else:
         keyboard_controller.press(key)
     keyboard_controller.release(key)
+
+
+def move_mouse(dx: int, dy: int):
+    mouse_controller.move(dx, dy)
+
+
+def click_mouse(button_type: str):
+    if button_type == "left":
+        mouse_controller.click(Button.left, 1)
+    elif button_type == "right":
+        mouse_controller.click(Button.right, 1)
 
 
 BINDS = {
