@@ -103,6 +103,7 @@ BINDS = {
     "redo": lambda: press_key_combination(Key.cmd, "y"),
     "clear": clear_text,
     "select": lambda: press_key_combination(Key.cmd, "a"),
+    "apps": lambda: press_key_combination(Key.alt, Key.space),
 }
 
 
