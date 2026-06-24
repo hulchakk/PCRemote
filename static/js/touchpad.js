@@ -14,9 +14,7 @@ document.addEventListener("touchstart", (e) => {
     e.preventDefault();
     activeTouchpad = pad;
 
-    if (e.touches.length > maxTouches) {
-        maxTouches = e.touches.length;
-    }
+    maxTouches = Math.max(maxTouches, e.touches.length);
 
     if (e.touches.length > 0) {
         lastX = e.touches[0].clientX;
@@ -32,11 +30,11 @@ document.addEventListener("touchmove", (e) => {
     if (!activeTouchpad) return;
 
     e.preventDefault();
-    
+
     if (e.touches.length > 0) {
         const currentX = e.touches[0].clientX;
         const currentY = e.touches[0].clientY;
-        
+
         const dx = Math.round(currentX - lastX);
         const dy = Math.round(currentY - lastY);
 
@@ -44,10 +42,19 @@ document.addEventListener("touchmove", (e) => {
             isTapping = false;
         }
 
-        if ((dx !== 0 || dy !== 0) && window.socket && window.socket.connected) {
-            window.socket.emit("mouse_move", { dx: dx, dy: dy });
+        if (window.socket && window.socket.connected) {
+            if (e.touches.length >= 2) {
+                window.socket.emit("mouse_scroll", {
+                    dx: 0,
+                    dy: -dy
+                });
+            } else {
+                if (dx !== 0 || dy !== 0) {
+                    window.socket.emit("mouse_move", { dx, dy });
+                }
+            }
         }
-        
+
         lastX = currentX;
         lastY = currentY;
     }
@@ -55,12 +62,12 @@ document.addEventListener("touchmove", (e) => {
 
 document.addEventListener("touchend", (e) => {
     if (!activeTouchpad) return;
-    
+
     e.preventDefault();
-    
+
     if (isTapping && e.touches.length === 0) {
         const duration = Date.now() - startTime;
-        
+
         if (duration < 300 && window.socket && window.socket.connected) {
             const buttonType = maxTouches >= 2 ? "right" : "left";
             window.socket.emit("mouse_click", { button: buttonType });
