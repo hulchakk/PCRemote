@@ -4,7 +4,6 @@ import socket
 import subprocess
 import sys
 
-from pynput import keyboard
 from pynput.keyboard import Controller as KeyboardController, Key, KeyCode
 from pynput.mouse import Controller as MouseController, Button
 
@@ -65,6 +64,10 @@ def click_mouse(button_type: str):
         mouse_controller.click(Button.right, 1)
 
 
+def scroll_mouse(dx: int, dy: int):
+    mouse_controller.scroll(dx * SCROLL_SIZE, dy * SCROLL_SIZE)
+
+
 def type_text(text: str):
     if not isinstance(text, str):
         return
@@ -76,7 +79,9 @@ def clear_text():
     BINDS["delete"]()
 
 
-SENSATIVITY = 1.8
+SENSATIVITY = 1.5
+
+SCROLL_SIZE = 2
 
 BINDS = {
     "left": lambda: press_key(Key.left),
