@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 from flask_socketio import SocketIO, emit
-from utils import BINDS, system_sleep, click_mouse, move_mouse, type_text
+from utils import BINDS, system_sleep, click_mouse, move_mouse, type_text, scroll_mouse
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "12345"
@@ -67,6 +67,16 @@ def handle_mouse_click(data):
         click_mouse(button)
     except Exception as e:
         print(f"Mouse click error: {e}")
+
+
+@socketio.on("mouse_scroll")
+def handle_mouse_scroll(data):
+    try:
+        dx = data.get("dx", 0)
+        dy = data.get("dy", 0)
+        scroll_mouse(dx, dy)
+    except Exception as e:
+        print(f"Mouse scroll error: {e}")
 
 
 if __name__ == "__main__":
