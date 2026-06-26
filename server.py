@@ -13,7 +13,6 @@ def _serve(host: str, port: int):
         port=port,
         debug=False,
         use_reloader=False,
-        allow_unsafe_werkzeug=True,
     )
 
 

@@ -72,7 +72,7 @@ class App(ctk.CTk):
 
         qr = qrcode.make(url).convert("RGB")
         qr = qr.resize((220, 220))
-        self.qr_image = ImageTk.PhotoImage(qr)
+        self.qr_image = ctk.CTkImage(light_image=qr, dark_image=qr, size=(250, 250))
 
         self.qr_label = ctk.CTkLabel(frame, text="", image=self.qr_image)
         self.qr_label.pack(pady=8)
