@@ -24,6 +24,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!keyName) return;
 
         window.socket.emit("keyboard", { key: keyName });
+        if (keyName === "clear") {
+                document.getElementById("text-input").value = "";
+        }
     });
 
     tabs.forEach(tab => {
