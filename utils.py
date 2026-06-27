@@ -6,7 +6,6 @@ import socket
 import subprocess
 import sys
 
-from pynput import keyboard
 from pynput.keyboard import Controller as KeyboardController, Key, KeyCode
 from pynput.mouse import Controller as MouseController, Button
 
