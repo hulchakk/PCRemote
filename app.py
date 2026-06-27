@@ -1,22 +1,70 @@
-from flask import Flask, render_template, request
+import functools
+import os
+import secrets
+
+from flask import Flask, render_template, request, session, redirect
 from flask_socketio import SocketIO, emit
-from utils import BINDS, system_sleep, click_mouse, move_mouse, type_text, scroll_mouse
+from utils import (
+    BINDS,
+    system_sleep,
+    click_mouse,
+    move_mouse,
+    type_text,
+    scroll_mouse,
+    hash_password,
+)
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "12345"
+app.config["SECRET_KEY"] = secrets.token_bytes(32).hex()
 socketio = SocketIO(app, cors_allowed_origins="*")
 
 VALID_REMOTES = ("media", "touchpad", "text")
 
+REMOTE_PASSWORD = os.getenv("REMOTE_PASSWORD", "")
+
+
+def login_required(func):
+    @functools.wraps(func)
+    def inner(*args, **kwargs):
+        if not session.get("is_authenticated") and REMOTE_PASSWORD != "":
+            return redirect("/login")
+        return func(*args, **kwargs)
+
+    return inner
+
+
+@socketio.on("connect")
+def handle_connect():
+    if REMOTE_PASSWORD and not session.get("is_authenticated"):
+        return False
+
 
 @app.route("/partials/<remote_type>")
+@login_required
 def get_partial(remote_type):
     if remote_type in VALID_REMOTES:
         return render_template(f"partials/{remote_type}.html")
     return "Not found", 404
 
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if REMOTE_PASSWORD == "":
+        return redirect("/")
+
+    if request.method == "GET":
+        return render_template("login.html")
+    elif request.method == "POST":
+        password = hash_password(request.form.get("password"))
+        if password == REMOTE_PASSWORD:
+            session["is_authenticated"] = True
+            return redirect("/")
+        else:
+            return render_template("login.html", error="Wrong password")
+
+
 @app.route("/")
+@login_required
 def index():
     return render_template("index.html")
 
