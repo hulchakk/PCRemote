@@ -1,4 +1,6 @@
+import hashlib
 import os
+import secrets
 import shutil
 import socket
 import subprocess
@@ -115,3 +117,10 @@ def get_local_ip():
     finally:
         s.close()
     return ip
+
+
+def hash_password(password: str):
+    salt = os.getenv("PASSWORD_SALT")
+    if not salt:
+        salt = os.environ["PASSWORD_SALT"] = secrets.token_bytes(32).hex()
+    return hashlib.sha256((password + salt).encode()).hexdigest()
