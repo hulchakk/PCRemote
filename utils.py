@@ -6,6 +6,7 @@ import socket
 import subprocess
 import sys
 
+from pynput import keyboard
 from pynput.keyboard import Controller as KeyboardController, Key, KeyCode
 from pynput.mouse import Controller as MouseController, Button
 
@@ -45,14 +46,12 @@ def press_key(key: Key | str):
     keyboard_controller.release(key)
 
 
-def press_key_combination(first: Key | str, second: Key | str):
-    if isinstance(first, str):
-        first = KeyCode.from_char(first)
-    if isinstance(second, str):
-        second = KeyCode.from_char(second)
-    with keyboard_controller.pressed(first):
-        keyboard_controller.press(second)
-        keyboard_controller.release(second)
+def press_key_combination(*keys: str | Key):
+    resolved_keys = [
+        KeyCode.from_char(key) if isinstance(key, str) else key for key in keys
+    ]
+    with keyboard_controller.pressed(*resolved_keys):
+        pass
 
 
 def move_mouse(dx: int, dy: int):
