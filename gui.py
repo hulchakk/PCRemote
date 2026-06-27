@@ -1,10 +1,11 @@
+import os
+
 import customtkinter as ctk
 from tkinter import messagebox
 import qrcode
-from PIL import Image, ImageTk
 
 from server import start_server, stop_server, is_server_running
-from utils import get_local_ip
+from utils import get_local_ip, hash_password
 
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
@@ -47,16 +48,30 @@ class App(ctk.CTk):
         frame.pack(padx=16, pady=16, fill="both", expand=True)
 
         lbl = ctk.CTkLabel(master=frame, text="Port:", anchor="w")
-        lbl.place(x=12, y=12)
+        lbl.grid(row=0, column=0, pady=8)
+
+        lbl = ctk.CTkLabel(master=frame, text="Password:", anchor="w")
+        lbl.grid(row=1, column=0, pady=8)
 
         self.port_var = ctk.StringVar(value="8000")
+        self.password_var = ctk.StringVar(value="")
+
         entry = ctk.CTkEntry(master=frame, textvariable=self.port_var, width=120)
-        entry.place(x=12, y=40)
+        entry.grid(row=0, column=1)
+
+        entry = ctk.CTkEntry(
+            master=frame,
+            textvariable=self.password_var,
+            width=120,
+            placeholder_text="Password is optional",
+            show="*",
+        )
+        entry.grid(row=1, column=1)
 
         start_btn = ctk.CTkButton(
             master=frame, text="Start", width=90, command=self.on_start
         )
-        start_btn.place(x=190, y=36)
+        start_btn.grid(row=2, column=0, pady=8)
 
     def build_running_screen(self, port: int):
         self.clear_window()
@@ -82,6 +97,14 @@ class App(ctk.CTk):
 
     def on_start(self):
         port_str = self.port_var.get().strip()
+
+        password = self.password_var.get().strip()
+
+        if password == "":
+            os.environ["REMOTE_PASSWORD"] = ""
+        else:
+            os.environ["REMOTE_PASSWORD"] = hash_password(password)
+
         if not port_str.isdigit():
             messagebox.showerror("Error", "Port must be an integer")
             return
